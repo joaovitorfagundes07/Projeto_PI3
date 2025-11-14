@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>SCER | Painel</title>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700&display=fallback">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free/css/all.min.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/admin-lte@3.2/dist/css/adminlte.min.css">
+</head>
+<body class="hold-transition sidebar-mini layout-fixed">
+<div class="wrapper">
+
+  <!-- Navbar -->
+  <nav class="main-header navbar navbar-expand navbar-white navbar-light">
+    <ul class="navbar-nav">
+      <li class="nav-item">
+        <a class="nav-link" data-widget="pushmenu" href="#" role="button"><i class="fas fa-bars"></i></a>
+      </li>
+    <% if (usuarioLogado) { %>
+  <% if (usuarioLogado.id_perfil == 1) { %>
+    <li class="nav-item">
+      <a href="/ordens" class="nav-link <%= (active==='ordens') ? 'active' : '' %>">
+        <i class="nav-icon fas fa-file-contract"></i>
+        <p>Ordens</p>
+      </a>
+    </li>
+    <li class="nav-item">
+      <a href="/ordens/relatorios" class="nav-link <%= (active==='relatorios') ? 'active' : '' %>">
+        <i class="nav-icon fas fa-chart-bar"></i>
+        <p>Relatórios</p>
+      </a>
+    </li>
+  <% } %>
+  <li class="nav-item"><a href="/" class="nav-link">Sair</a></li>
+<% } else { %>
+  <li class="nav-item"><a href="/login" class="nav-link">Login</a></li>
+<% } %>
+</ul>
+  </nav>
+  <!-- /.navbar -->
+
+  <!-- Main Sidebar Container -->
+  <aside class="main-sidebar sidebar-dark-primary elevation-4">
+    <a href="#" class="brand-link">
+      <span class="brand-text font-weight-light">Agro</span>
+    </a>
+    <div class="sidebar">
+      <nav class="mt-2">
+        <ul class="nav nav-pills nav-sidebar flex-column" role="menu">
+          <li class="nav-item">
+            <a href="/login/campos" class="nav-link <%= (active === 'inicio') ? 'active' : '' %>">
+              <i class="nav-icon fas fa-home"></i>
+              <p>Início</p>
+            </a>
+          </li>
+          <li class="nav-item">
+            <a href="/equipamentos" class="nav-link <%= (active === 'equipamentos') ? 'active' : '' %>">
+              <i class="nav-icon fas fa-cogs"></i>
+              <p>Equipamentos</p>
+            </a>
+          </li>
+          <li class="nav-item">
+            <a href="/marcas" class="nav-link <%= (active === 'marcas') ? 'active' : '' %>">
+              <i class="nav-icon fas fa-tags"></i>
+              <p>Marcas</p>
+            </a>
+          </li>
+          <li class="nav-item">
+            <a href="/servicos" class="nav-link <%= (active === 'servicos') ? 'active' : '' %>">
+              <i class="nav-icon fas fa-tools"></i>
+              <p>Serviços</p>
+            </a>
+          </li>
+          <li class="nav-item">
+            <a href="/ordens" class="nav-link <%= (active === 'ordens') ? 'active' : '' %>">
+              <i class="nav-icon fas fa-file-alt"></i>
+              <p>Ordens de Serviço</p>
+            </a>
+          </li>
+          <li class="nav-item">
+            <a href="/relatorios" class="nav-link <%= (active === 'relatorios') ? 'active' : '' %>">
+              <i class="nav-icon fas fa-chart-line"></i>
+              <p>Relatórios</p>
+            </a>
+          </li>
+
+            </a>
+          </li>
+        </ul>
+      </nav>
+    </div>
+  </aside>
+
+  <!-- Content Wrapper. Contains page content -->
+  <div class="content-wrapper">
+    <section class="content pt-4">
+      <div class="container-fluid">
+        <!-- Aqui entra o conteúdo da página -->
+        <%- body %>
+      </div>
+    </section>
+  </div>
+  <!-- /.content-wrapper -->
+
+  <footer class="main-footer">
+    <strong>Copyright &copy; 2025 SCER.</strong>
+    Todos os direitos reservados.
+  </footer>
+</div>
+<script src="https://cdn.jsdelivr.net/npm/jquery@3.7.1/dist/jquery.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/admin-lte@3.2/dist/js/adminlte.min.js"></script>
+</body>
+</html>

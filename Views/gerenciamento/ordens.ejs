@@ -1,0 +1,142 @@
+<div class="container-fluid p-4">
+  <h3>Ordens de Serviço</h3>
+  <div class="mb-3">
+    <button id="btnRefresh" class="btn btn-secondary">Recarregar</button>
+    <!-- botão para abrir modal de nova ordem -->
+    <button id="btnNovaOrdem" class="btn btn-success">Nova Ordem</button>
+  </div>
+
+  <div class="table-responsive">
+  <table class="table table-striped">
+    <thead>
+      <tr><th>ID</th><th>Serviço</th><th>Cliente</th><th>Equipamento</th><th>Data Abertura</th><th>Status</th><th>Ações</th></tr>
+    </thead>
+    <tbody id="ordensBody">
+      <% if (ordens && ordens.length) { ordens.forEach(o => { %>
+        <tr>
+          <td><%= o.id %></td>
+          <td><%= o.servico_nome || '' %></td>
+          <td><%= o.cliente || '' %></td>
+          <td><%= o.equipamento_nome ? (o.equipamento_nome + ' - ' + o.modelo) : 'Nenhum' %></td>
+          <td><%= o.data_abertura || '' %></td>
+          <td><%= o.status || '' %></td>
+          <td>
+            <% if (o.status !== 'concluida') { %>
+              <button class="btnConcluir btn btn-sm btn-success" data-id="<%= o.id %>">Concluir</button>
+            <% } %>
+          </td>
+        </tr>
+      <% }) } else { %>
+        <tr><td colspan="7">Nenhuma ordem encontrada.</td></tr>
+      <% } %>
+    </tbody>
+  </table>
+  </div>
+</div>
+
+<!-- Modal de nova ordem -->
+<div class="modal fade" id="modalNovaOrdem" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content p-3">
+      <h5>Abrir Ordem de Serviço</h5>
+      <form id="formNovaOrdem">
+        <div class="mb-2">
+          <label for="servico_id">Serviço:</label>
+          <select name="servico_id" id="servico_id" class="form-select" required>
+            <option value="">-- selecione --</option>
+            <% if (servicos && servicos.length) { servicos.forEach(s => { %>
+              <option value="<%= s.id %>"><%= s.nome %></option>
+            <% }) } %>
+          </select>
+        </div>
+        <div class="mb-2">
+          <label for="cliente">Nome do Cliente:</label>
+          <input type="text" name="cliente" id="cliente" class="form-control" required />
+        </div>
+        <div class="mb-2">
+          <label for="descricao">Descrição:</label>
+          <textarea name="descricao" id="descricao" class="form-control"></textarea>
+        </div>
+        <div class="mb-3">
+          <label for="equipamento">Equipamento:</label>
+          <select name="equipamento" id="equipamento" class="form-select">
+            <option value="">Nenhum</option>
+            <% equipamento.forEach(equipamento =>{ %>
+              <option value="<%= equipamento.id %>"><%= equipamento.nome %> - <%= equipamento.modelo %></option>
+            <% }) %>
+          
+          </select>
+        </div>
+        <div class="text-end mt-2">
+          <button type="submit" class="btn btn-primary">Abrir Ordem</button>
+      
+        </div>
+      </form>
+      <div id="msgOrdem" class="mt-2"></div>
+    </div>
+  </div>
+</div>
+
+<script>
+document.getElementById('btnRefresh').addEventListener('click', async function(){
+  const res = await fetch('/ordens/list_json');
+  if (res.ok) {
+    const ords = await res.json();
+    const tbody = document.getElementById('ordensBody');
+    tbody.innerHTML = '';
+    for (let o of ords) {
+      const equipDisplay = o.equipamento_nome ? (o.equipamento_nome + ' - ' + o.modelo) : 'Nenhum';
+      const tr = document.createElement('tr');
+      tr.innerHTML = `<td>${o.id}</td><td>${o.servico_nome||''}</td><td>${o.cliente||''}</td><td>${equipDisplay}</td><td>${o.data_abertura||''}</td><td>${o.status||''}</td>
+        <td>${o.status !== 'concluida' ? '<button class="btnConcluir btn btn-sm btn-success" data-id="'+o.id+'">Concluir</button>' : ''}</td>`;
+      tbody.appendChild(tr);
+    }
+  }
+});
+
+document.addEventListener('click', async function(e){
+  if (e.target.classList.contains('btnConcluir')) {
+    const id = e.target.getAttribute('data-id');
+    if (!confirm('Confirma conclusão da ordem ' + id + '?')) return;
+    const res = await fetch('/ordens/concluir', {method:'POST', headers:{'Content-type':'application/json'}, body: JSON.stringify({id})});
+    const j = await res.json();
+    alert(j.msg || (j.ok ? 'Concluida' : 'Erro'));
+    if (j.ok) location.reload();
+  }
+});
+
+document.getElementById('btnNovaOrdem').addEventListener('click', function(){
+  const modal = new bootstrap.Modal(document.getElementById('modalNovaOrdem'));
+  modal.show();
+});
+
+const fecharBtn = document.getElementById('fecharModal');
+if (fecharBtn) {
+  fecharBtn.addEventListener('click', function(){
+    const modalElem = document.getElementById('modalNovaOrdem');
+    const modal = bootstrap.Modal.getInstance(modalElem);
+    if (modal) modal.hide();
+    const form = document.getElementById('formNovaOrdem');
+    if (form) form.reset();
+  });
+}
+
+document.getElementById('formNovaOrdem').addEventListener('submit', async function(e){
+  e.preventDefault();
+  const equipValue = document.getElementById('equipamento').value;
+  const data = {
+    servico_id: document.getElementById('servico_id').value,
+    cliente: document.getElementById('cliente').value,
+    descricao: document.getElementById('descricao').value,
+    equipamento_id: equipValue ? parseInt(equipValue) : null
+  };
+  const res = await fetch('/ordens/abrir', {method:'POST', headers:{'Content-type':'application/json'}, body: JSON.stringify(data)});
+  const j = await res.json();
+  if (j.ok) {
+    alert('Ordem aberta com ID: ' + j.id);
+    location.reload();
+  } else {
+    alert(j.msg || 'Erro ao abrir ordem');
+  }
+});
+</script>

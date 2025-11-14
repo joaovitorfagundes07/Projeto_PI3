@@ -1,0 +1,106 @@
+-- Cria o banco de dados
+CREATE DATABASE IF NOT EXISTS projeto;
+USE projeto;
+
+-- Tabela de perfis
+CREATE TABLE IF NOT EXISTS perfis (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    nome VARCHAR(50) NOT NULL
+);
+
+-- Tabela de usuários
+CREATE TABLE IF NOT EXISTS usuarios (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    nome VARCHAR(100) NOT NULL,
+    email VARCHAR(100) NOT NULL UNIQUE,
+    senha VARCHAR(255) NOT NULL,
+    ativo BOOLEAN DEFAULT TRUE,
+    id_perfil INT DEFAULT 2,
+    CONSTRAINT fk_perfil FOREIGN KEY (id_perfil) REFERENCES perfis(id)
+);
+
+-- Tabela de marcas
+CREATE TABLE IF NOT EXISTS marca (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    nome VARCHAR(100) NOT NULL,
+    tipo ENUM('equipamento','insumo') NOT NULL
+);
+
+-- Tabela de equipamentos
+CREATE TABLE IF NOT EXISTS equipamento (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    nome VARCHAR(100) NOT NULL,
+    marca VARCHAR(100) NOT NULL,
+    modelo VARCHAR(100) NOT NULL,
+    quantidade INT NOT NULL
+);
+
+-- Tabela de serviços
+CREATE TABLE IF NOT EXISTS servico (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    nome VARCHAR(100) NOT NULL,
+    descricao VARCHAR(255) NOT NULL,
+    ativo BOOLEAN DEFAULT TRUE
+);
+
+-- Tabela de ordens de serviço (nova)
+CREATE TABLE IF NOT EXISTS ordemservico (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    servico_id INT NOT NULL,
+    equipamento_id INT NULL,
+    cliente VARCHAR(100) NOT NULL,
+    descricao TEXT,
+    status ENUM('aberta','concluida') DEFAULT 'aberta',
+    data_abertura DATETIME DEFAULT CURRENT_TIMESTAMP,
+    data_conclusao DATETIME NULL,
+    FOREIGN KEY (servico_id) REFERENCES servico(id),
+    FOREIGN KEY (equipamento_id) REFERENCES equipamento(id)
+);
+
+-- Inserções iniciais
+INSERT INTO perfis (nome)
+VALUES ('admin'), ('usuario')
+ON DUPLICATE KEY UPDATE nome = VALUES(nome);
+
+-- Usuário admin padrão (senha simples para testes)
+INSERT INTO usuarios (nome, email, senha)
+VALUES ('Admin', 'admin@email.com', '123456')
+ON DUPLICATE KEY UPDATE nome = VALUES(nome);
+
+-- Serviços exemplo
+INSERT INTO servico (nome, descricao, ativo)
+VALUES 
+('Manutenção Preventiva', 'Verificação e limpeza do equipamento', TRUE),
+('Colheita', 'Colheitas em locais', TRUE),
+('Instalação cercado', 'Instalação e reparo', TRUE)
+ON DUPLICATE KEY UPDATE nome = VALUES(nome);
+
+-- Marcas exemplo
+INSERT INTO marca (nome, tipo)
+VALUES 
+('John Deere', 'equipamento'),
+('Makita', 'equipamento'),
+('tramontina', 'insumo'),
+('fluid', 'insumo')
+ON DUPLICATE KEY UPDATE nome = VALUES(nome);
+
+-- Equipamentos exemplo
+INSERT INTO equipamento (nome, marca, modelo, quantidade)
+VALUES 
+('makita serra', 'makita', 'E7450', 10),
+('Pá ', 'makita', 'V24', 15)
+ON DUPLICATE KEY UPDATE nome = VALUES(nome);
+
+-- Ordens de serviço exemplo
+INSERT INTO ordemservico (servico_id, cliente, descricao, status)
+VALUES
+(1, 'João da Silva', 'Limpeza interna e teste de desempenho', 'concluida'),
+(2, 'Maria Souza', 'Troca de HD e reinstalação do sistema', 'aberta');
+
+
+select * from ordemservico;
+select * from usuarios;
+select * from marca;
+select * from equipamento;
+select * from servico;
+select * from ordemservico;

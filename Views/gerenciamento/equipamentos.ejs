@@ -1,0 +1,40 @@
+<div class="mb-3 text-end">
+            <a href="/equip/formularioequip" class="btn btn-success">
+                <i class="bi bi-plus-lg"></i> Novo Equipamento
+            </a>
+        </div>
+        <table class="table table-bordered table-hover bg-white">
+            <thead class="table-success">
+                <tr>
+                    <th>ID</th>
+                    <th>Nome</th>
+                    <th>Marca</th>
+                    <th>Modelo</th>
+                    <th>Quantidade</th>
+                    <th>Ações</th>
+                </tr>
+            </thead>
+            <tbody>
+                <% for (let i = 0; i < equipamentos.length; i++) { %>
+                    <tr>
+                        <td><%= equipamentos[i].id %></td>
+                        <td><%= equipamentos[i].nome %></td>
+                        <td><%= equipamentos[i].marca %></td>
+                        <td><%= equipamentos[i].modelo %></td>
+                        <td><%= equipamentos[i].quantidade %></td>
+                        <td>
+                            <button data-id="<%= equipamentos[i].id %>" class="btn btn-primary btn-md me-1 btnEditar" title="Editar">
+                                <i class="fas fa-pen"></i>
+                            </button>
+
+                            <button data-id="<%= equipamentos[i].id %>" class="btn btn-danger btn-md btnExcluir" title="Excluir">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </td>
+                    </tr>
+                <% } %>
+            </tbody>
+        </table>
+    </div>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="/assets/js/equipamento/listarequip.js"></script>

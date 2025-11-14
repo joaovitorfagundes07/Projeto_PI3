@@ -1,0 +1,94 @@
+<div class="container-fluid p-4">
+  <h3>Relatórios - Ordens de Serviço</h3>
+
+  <div class="row g-3">
+    <div class="col-md-3">
+      <label>Período início</label>
+      <input type="date" id="start" class="form-control"/>
+    </div>
+    <div class="col-md-3">
+      <label>Período fim</label>
+      <input type="date" id="end" class="form-control"/>
+    </div>
+    <div class="col-md-3 d-flex align-items-end">
+      <button id="btnGerar" class="btn btn-primary">Gerar relatório</button>
+      <button id="btnImprimir" class="btn btn-secondary ms-2">Imprimir (Salvar como PDF)</button>
+      <button id="btnGerarPdf" class="btn btn-info ms-2">Gerar PDF (Servidor)</button>
+    </div>
+  </div>
+
+  <hr/>
+
+  <div class="row g-3 mt-2">
+    <div class="col-md-4">
+      <label>Marca</label>
+      <input id="fMarca" class="form-control" placeholder="Marca"/>
+      <button id="btnMarcaPdf" class="btn btn-outline-primary mt-2">Baixar PDF</button>
+    </div>
+    <div class="col-md-4">
+      <label>ID do Serviço</label>
+      <select id="fServico" class="form-select">
+        <option value="">-- selecione --</option>
+        <% if (servicos && servicos.length) { servicos.forEach(s => { %>
+          <option value="<%= s.id %>"><%= s.nome %></option>
+        <% }) } %>
+      </select>
+      <button id="btnServicoPdf" class="btn btn-outline-primary mt-2">Baixar PDF</button>
+    </div>
+    <div class="col-md-4">
+      <label>Nome do Cliente</label>
+      <input id="fCliente" class="form-control" placeholder="Cliente"/>
+      <button id="btnClientePdf" class="btn btn-outline-primary mt-2">Baixar PDF</button>
+    </div>
+  </div>
+
+  <div id="relatorioArea" class="mt-3">
+    <!-- resultado -->
+  </div>
+</div>
+
+<script>
+document.getElementById('btnGerar').addEventListener('click', async function(){
+  const start = document.getElementById('start').value;
+  const end = document.getElementById('end').value;
+  const res = await fetch('/relatorio/periodo?start=' + encodeURIComponent(start) + '&end=' + encodeURIComponent(end));
+  const j = await res.json();
+  if (!j.ok) { alert('Erro'); return; }
+  const ords = j.ordens;
+  let html = '<table class="table"><thead><tr><th>ID</th><th>Serviço</th><th>Cliente</th><th>Data Abertura</th><th>Status</th></tr></thead><tbody>';
+  for (let o of ords) {
+    html += `<tr><td>${o.id}</td><td>${o.servico_nome||''}</td><td>${o.cliente||''}</td><td>${o.data_abertura||''}</td><td>${o.status||''}</td></tr>`;
+  }
+  html += '</tbody></table>';
+  document.getElementById('relatorioArea').innerHTML = html;
+});
+
+document.getElementById('btnImprimir').addEventListener('click', function(){
+  window.print();
+});
+
+document.getElementById('btnGerarPdf').addEventListener('click', function(){
+  const start = document.getElementById('start').value;
+  const end = document.getElementById('end').value;
+  const url = '/relatorios/pdf?type=periodo&start=' + encodeURIComponent(start) + '&end=' + encodeURIComponent(end);
+  window.open(url, '_blank');
+});
+
+document.getElementById('btnClientePdf').addEventListener('click', function(){
+  const cliente = document.getElementById('fCliente').value;
+  const url = '/relatorios/pdf?type=cliente&cliente=' + encodeURIComponent(cliente);
+  window.open(url, '_blank');
+});
+
+document.getElementById('btnServicoPdf').addEventListener('click', function(){
+  const serv = document.getElementById('fServico').value;
+  const url = '/relatorios/pdf?type=servico&servico_id=' + encodeURIComponent(serv);
+  window.open(url, '_blank');
+});
+
+document.getElementById('btnMarcaPdf').addEventListener('click', function(){
+  const marca = document.getElementById('fMarca').value;
+  // endpoint por marca não implementado no PDF servidor (pode ser implementado conforme necessidade)
+  alert('Relatório por marca não implementado no servidor ainda. Use filtros manuais.');
+});
+</script>

@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title><%= typeof pageTitle !== 'undefined' ? pageTitle : 'Sistema' %></title>
+  <link rel="stylesheet" href="/assets/css/main.css">
+</head>
+<body>
+  <header>
+    <nav class="navbar">
+      <a href="/">Início</a> |
+      <a href="/gerenciamento/ordens">Ordens</a> |
+      <a href="/gerenciamento/relatorios">Relatórios</a>
+      <% if (locals && locals.usuarioLogado) { %>
+        | <span>Olá, <%= usuarioLogado.nome %></span>
+        | <a href="/login/logout">Sair</a>
+      <% } else { %>
+        | <a href="/login">Entrar</a>
+      <% } %>
+    </nav>
+  </header>
+  <main>

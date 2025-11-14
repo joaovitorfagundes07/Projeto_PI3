@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <title><%= marca ? 'Editar Marca' : 'Cadastro de Marca' %></title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body {
+            background-color: #d9e6f2; /* Azul suave */
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        .form-card {
+            background: #ffffff;
+            border-radius: 15px;
+            padding: 40px 30px;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.15);
+            max-width: 450px;
+            width: 100%;
+            position: relative;
+        }
+        .form-card h2 {
+            margin-bottom: 30px;
+            font-weight: 600;
+            color: #0d3b66; /* Azul escuro */
+            text-align: center;
+        }
+        .form-label {
+            font-weight: 500;
+            color: #0d3b66;
+        }
+        .btn-primary {
+            background-color: #1e90ff;
+            border-color: #1e90ff;
+            font-weight: 500;
+        }
+        .btn-primary:hover {
+            background-color: #1c86ee;
+            border-color: #1874cd;
+        }
+        .btn-voltar {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+        }
+    </style>
+</head>
+<body>
+    <div class="form-card">
+        <a href="/marcas" class="btn btn-danger btn-sm btn-voltar">Voltar</a>
+        <h2><%= marca ? 'Editar Marca' : 'Cadastro de Marca' %></h2>
+
+        <form id="formMarca">
+            <input type="hidden" id="id" value="<%= marca ? marca.id : '' %>">
+
+            <div class="mb-3">
+                <label for="nome" class="form-label">Nome da Marca</label>
+                <input type="text" class="form-control" id="nome" name="nome" required value="<%= marca ? marca.nome : '' %>">
+            </div>
+
+            <div class="mb-3">
+                <label for="tipo" class="form-label">Tipo</label>
+                <select id="tipo" name="tipo" class="form-select" required>
+                    <option value="equipamento" <%= marca && marca.tipo==='equipamento' ? 'selected' : '' %>>Equipamento</option>
+                    <option value="insumo" <%= marca && marca.tipo==='insumo' ? 'selected' : '' %>>Insumo</option>
+                </select>
+            </div>
+
+            <div class="d-grid mt-4">
+                <button type="submit" class="btn btn-primary btn-lg">
+                    <%= marca ? 'Atualizar Marca' : 'Cadastrar Marca' %>
+                </button>
+            </div>
+        </form>
+        <div id="msg" class="mt-2"></div>
+    </div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script src="/assets/js/marca/cadastrar.js"></script>
+</body>
+</html>
