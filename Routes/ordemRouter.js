@@ -11,6 +11,8 @@ router.get('/ordens/list_json', auth.validar, ctrl.listJson.bind(ctrl));
 router.get('/relatorio/periodo', auth.validar, ctrl.relatorioPorPeriodo.bind(ctrl));
 router.get('/relatorio/cliente', auth.validar, ctrl.relatorioPorCliente.bind(ctrl));
 router.get('/relatorio/servico', auth.validar, ctrl.relatorioPorServico.bind(ctrl));
+router.get('/relatorio/status', auth.validar, ctrl.relatorioPorStatus.bind(ctrl));
+router.get('/relatorio/marca', auth.validar, ctrl.relatorioPorMarca.bind(ctrl));
 router.get('/relatorios/pdf', auth.validar, ctrl.relatorioPdf.bind(ctrl));
 
 // APIs públicas

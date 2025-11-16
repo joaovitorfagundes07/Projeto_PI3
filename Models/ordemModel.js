@@ -28,16 +28,28 @@ class OrdemModel {
         return this.db.ExecutaComando('SELECT o.*, s.nome as servico_nome, e.nome as equipamento_nome, e.marca, e.modelo FROM ordemservico o LEFT JOIN servico s ON s.id = o.servico_id LEFT JOIN equipamento e ON e.id = o.equipamento_id WHERE o.data_abertura BETWEEN ? AND ? ORDER BY o.data_abertura DESC', [startDate, endDate]);
     }
 
-    listByMarca(marca) {
-        return this.db.ExecutaComando('SELECT o.*, s.nome as servico_nome FROM ordemservico o LEFT JOIN servico s ON s.id = o.servico_id WHERE o.marca = ? ORDER BY o.data_abertura DESC', [marca]);
-    }
-
     listByCliente(cliente) {
         return this.db.ExecutaComando('SELECT o.*, s.nome as servico_nome, e.nome as equipamento_nome, e.marca, e.modelo FROM ordemservico o LEFT JOIN servico s ON s.id = o.servico_id LEFT JOIN equipamento e ON e.id = o.equipamento_id WHERE o.cliente LIKE ? ORDER BY o.data_abertura DESC', ['%' + cliente + '%']);
     }
 
     listByServico(servicoId) {
         return this.db.ExecutaComando('SELECT o.*, s.nome as servico_nome, e.nome as equipamento_nome, e.marca, e.modelo FROM ordemservico o LEFT JOIN servico s ON s.id = o.servico_id LEFT JOIN equipamento e ON e.id = o.equipamento_id WHERE o.servico_id = ? ORDER BY o.data_abertura DESC', [servicoId]);
+    }
+    listByequipamento(equipamentoId) {
+        return this.db.ExecutaComando('SELECT o.*, s.nome as servico_nome, e.nome as equipamento_nome, e.marca, e.modelo FROM ordemservico o LEFT JOIN servico s ON s.id = o.servico_id LEFT JOIN equipamento e ON e.id = o.equipamento_id WHERE o.equipamento_id = ? ORDER BY o.data_abertura DESC', [equipamentoId]);
+    }
+
+    listByStatus(status) {
+        return this.db.ExecutaComando('SELECT o.*, s.nome as servico_nome, e.nome as equipamento_nome, e.marca, e.modelo FROM ordemservico o LEFT JOIN servico s ON s.id = o.servico_id LEFT JOIN equipamento e ON e.id = o.equipamento_id WHERE o.status = ? ORDER BY o.data_abertura DESC', [status]);
+    }
+
+    listByMarca(marca) {
+        return this.db.ExecutaComando('SELECT o.*, s.nome as servico_nome, e.nome as equipamento_nome, e.marca, e.modelo FROM ordemservico o LEFT JOIN servico s ON s.id = o.servico_id LEFT JOIN equipamento e ON e.id = o.equipamento_id WHERE e.marca = ? ORDER BY o.data_abertura DESC', [marca]);
+    }
+
+    // retorna lista de clientes distintos presentes nas ordens
+    listClientesDistinct() {
+        return this.db.ExecutaComando('SELECT DISTINCT cliente FROM ordemservico WHERE cliente IS NOT NULL AND cliente <> "" ORDER BY cliente', []);
     }
 }
 

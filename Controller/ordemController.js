@@ -4,6 +4,8 @@ const EquipamentoModel = require('../Models/equipamentoModel');
 const ordemModel = new OrdemModel();
 const servicoModel = new ServicoModel();
 const equipamentoModel = new EquipamentoModel();
+const MarcaModel = require('../Models/marcaModel');
+const marcaModel = new MarcaModel();
 const ejs = require('ejs');
 const path = require('path');
 
@@ -36,9 +38,13 @@ class OrdemController {
         try {
             // opcional: enviar lista de serviços para filtro
             const servicos = await servicoModel.listAll();
+            const marcas = await marcaModel.listAll();
+            const clientesRows = await ordemModel.listClientesDistinct();
+            // converter rows em array simples de nomes
+            const clientes = (clientesRows || []).map(r => r.cliente);
             ejs.renderFile(
                 path.join(__dirname, '../Views/gerenciamento/relatorios.ejs'),
-                { servicos },
+                { servicos, marcas, clientes },
                 (err, body) => {
                     if (err) {
                         console.error('Erro ao renderizar relatorios.ejs', err);
@@ -130,7 +136,37 @@ class OrdemController {
         }
     }
 
-    // Gera PDF do relatório (parâmetros via query: type=periodo|cliente|servico e respectivos params)
+    // relatório por status (aberto/concluido) - JSON
+    async relatorioPorStatus(req, res) {
+        try {
+            const status = req.query.status; // 'aberta' ou 'concluida'
+            if (!status || !['aberta', 'concluida'].includes(status)) {
+                return res.json({ ok: false, msg: 'Status inválido', ordens: [] });
+            }
+            const ordens = await ordemModel.listByStatus(status);
+            res.json({ ok: true, ordens });
+        } catch (err) {
+            console.error(err);
+            res.json({ ok: false, ordens: [] });
+        }
+    }
+
+    // relatório por marca - JSON
+    async relatorioPorMarca(req, res) {
+        try {
+            const marca = req.query.marca;
+            if (!marca) {
+                return res.json({ ok: false, msg: 'Marca não fornecida', ordens: [] });
+            }
+            const ordens = await ordemModel.listByMarca(marca);
+            res.json({ ok: true, ordens });
+        } catch (err) {
+            console.error(err);
+            res.json({ ok: false, ordens: [] });
+        }
+    }
+
+    // Gera PDF do relatório (parâmetros via query: type=periodo|cliente|servico|status|marca)
     async relatorioPdf(req, res) {
         try {
             const puppeteer = require('puppeteer');
@@ -145,6 +181,12 @@ class OrdemController {
             } else if (type === 'servico') {
                 const servicoId = req.query.servico_id;
                 ordens = await ordemModel.listByServico(servicoId);
+            } else if (type === 'status') {
+                const status = req.query.status || 'aberta';
+                ordens = await ordemModel.listByStatus(status);
+            } else if (type === 'marca') {
+                const marca = req.query.marca;
+                ordens = await ordemModel.listByMarca(marca);
             } else {
                 ordens = await ordemModel.listAll();
             }
@@ -166,12 +208,13 @@ th { background:#f0f0f0; }
 <body>
 <h1>Relatório de Ordens de Serviço</h1>
 <table>
-<thead><tr><th>ID</th><th>Serviço</th><th>Cliente</th><th>Data Abertura</th><th>Data Conclusão</th><th>Status</th></tr></thead>
+<thead><tr><th>ID</th><th>Serviço</th><th>Cliente</th><th>Equipamento</th><th>Data Abertura</th><th>Data Conclusão</th><th>Status</th></tr></thead>
 <tbody>`;
             for (let o of ordens) {
                 const da = o.data_abertura ? new Date(o.data_abertura).toLocaleString('pt-BR') : '';
                 const dc = o.data_conclusao ? new Date(o.data_conclusao).toLocaleString('pt-BR') : '';
-                html += `<tr><td>${o.id || ''}</td><td>${o.servico_nome||''}</td><td>${o.cliente||''}</td><td>${da}</td><td>${dc}</td><td>${o.status||''}</td></tr>`;
+                const equip = o.equipamento_nome ? `${o.equipamento_nome} (${o.marca || 'N/A'})` : 'Sem equipamento';
+                html += `<tr><td>${o.id || ''}</td><td>${o.servico_nome||''}</td><td>${o.cliente||''}</td><td>${equip}</td><td>${da}</td><td>${dc}</td><td>${o.status||''}</td></tr>`;
             }
             html += `</tbody></table></body></html>`;
 
